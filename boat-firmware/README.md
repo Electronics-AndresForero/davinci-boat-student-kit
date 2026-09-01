@@ -51,12 +51,21 @@ boat-firmware/
 For each session:
 
 1. Open that exercise's `README.md` and read the concepts section first.
-2. Copy its `sketch.cpp` over `template/main/sketch.cpp`:
-   ```bash
-   cp boat-firmware/exercises/E1-xbox-pairing/sketch.cpp boat-firmware/template/main/sketch.cpp
-   ```
-   (or just open the exercise's `sketch.cpp` in VS Code, select all, copy, and paste
-   it over the contents of `template/main/sketch.cpp` — whichever is easier.)
+2. Copy its `sketch.cpp` over `template/main/sketch.cpp`. Two ways to do this — pick
+   whichever is easier:
+   - **The click-and-drag way (recommended if you're not comfortable with a
+     terminal):** in VS Code's file explorer (left sidebar), open the exercise's
+     `sketch.cpp` (e.g. `boat-firmware/exercises/E1-xbox-pairing/sketch.cpp`), select
+     all its text (`Ctrl+A` / `⌘+A`) and copy it (`Ctrl+C` / `⌘+C`), then open
+     `boat-firmware/template/main/sketch.cpp`, select all (`Ctrl+A` / `⌘+A`), and
+     paste over it (`Ctrl+V` / `⌘+V`). Save (`Ctrl+S` / `⌘+S`).
+   - **The command way:** open a terminal **inside VS Code** — top menu **Terminal →
+     New Terminal** — which opens already rooted in the repo folder you have open, so
+     no `cd` is needed first. Then type (this exact command works in both Windows
+     PowerShell and Mac Terminal):
+     ```bash
+     cp boat-firmware/exercises/E1-xbox-pairing/sketch.cpp boat-firmware/template/main/sketch.cpp
+     ```
 3. Fill in the `TODO`s directly in `template/main/sketch.cpp`.
 4. Open `template/` as the PlatformIO project (**File → Open Folder** →
    `boat-firmware/template`) and Build + Upload the `esp32dev` environment.
