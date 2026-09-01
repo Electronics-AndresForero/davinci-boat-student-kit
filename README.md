@@ -60,12 +60,17 @@ control boot behavior — `phase0-bringup/` explains why.
 | Xbox Wireless Controller 1914 (Series X\|S) | 1 | primary controller (BLE) |
 | Xbox One S controller 1708 | 1 | backup (update its firmware for BLE) |
 | Yellow TT motor (3–6 V) | 1 | **bench-test** motor for E2/E4/E5 |
-| 25GA-370 12 V gearmotor | 1 | the real paddle drive motor (final boat) |
+| JGA25-370 6 V gearmotor (170 RPM, 0.6 kg·cm) | 1 | the real paddle drive motor (final boat) |
 | MG90S servo | 1 | rudder |
 | 2S 18650 pack + holder (7.4 V nominal, up to 8.4 V full charge) | 1 | propulsion power |
 | SPDT/toggle switches | 2 | mode + arm |
 | LED + 330 Ω resistor | 1 | status indicator |
 | USB-C/micro cable (data, not charge-only) | 1 | flashing + serial |
+
+> ⚠️ **The real drive motor is 6 V-rated, same as the bench TT motor** — both are well
+> under our 2S 18650 pack's 7.4–8.4 V. Every exercise's `DUTY_CAP`/`TEST_DUTY_CAP`
+> (0.60) is a **permanent** safety cap for that reason, not just a bench-testing
+> stand-in to be raised later. Never set it toward 1.0 on this pack.
 
 ## Safety rules (read once, keep in mind every session)
 
