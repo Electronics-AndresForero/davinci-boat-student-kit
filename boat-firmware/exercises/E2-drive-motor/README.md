@@ -63,29 +63,9 @@ cycle that's **on** is the **duty cycle**, and the motor responds to the *averag
 > works); only raise it later if you *test* that the motor still drives at the higher
 > frequency.
 
-### ⛔ Why LEDC "never worked before" — the API changed
-
-This is a trap you'll hit if you copy an old tutorial. The Arduino-ESP32 core **3.x**
-(what our platform runs) **removed** the old channel-based LEDC functions:
-
-```cpp
-// ❌ 2.x — DOES NOT EXIST on our core 3.x. Copying this is why it breaks.
-ledcSetup(channel, freq, res);
-ledcAttachPin(pin, channel);
-ledcWrite(channel, duty);
-```
-
-The **3.x** API is **pin-based** — no channel bookkeeping, and `ledcWrite` takes the
-**pin**:
-
-```cpp
-// ✅ 3.x — what we use.
-ledcAttach(pin, freq, res);   // configure + attach in one call
-ledcWrite(pin, duty);         // write duty to the PIN
-```
-
-If you ever see `ledcSetup` in an example, you're reading 2.x-era code — mentally
-translate it.
+Our core's LEDC API is **pin-based**, not channel-based: `ledcAttach(pin, freq, bits)`
+configures and attaches in one call, and `ledcWrite(pin, duty)` writes straight to
+that pin — no channel numbers to track. That's the API `PaddleDrive` below uses.
 
 ### Ramping (slew limiting) — why we never snap to full
 
