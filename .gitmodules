@@ -1,0 +1,6 @@
+[submodule "boat-firmware/template"]
+	path = boat-firmware/template
+	url = https://github.com/ricardoquesada/esp-idf-arduino-bluepad32-template.git
+[submodule "E7-espnow-backup/handheld/template"]
+	path = E7-espnow-backup/handheld/template
+	url = https://github.com/ricardoquesada/esp-idf-arduino-bluepad32-template.git
