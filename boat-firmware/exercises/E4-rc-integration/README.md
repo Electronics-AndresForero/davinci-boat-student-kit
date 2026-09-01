@@ -168,10 +168,13 @@ correctly.
 Phase-specific traps — general tooling issues are in
 [../../../TROUBLESHOOTING.md](../../../TROUBLESHOOTING.md).
 
-- **Pairs but nothing moves:** re-confirm E2 basics — switch ON, ≥6V on the jack.
+- **Pairs but nothing moves:** re-confirm E2 basics — switch ON, the 2S 18650 pack
+  connected via the jack (not just USB).
 - **Motor hums but won't turn (servo fine):** current starvation — the motor now
-  shares the supply with the servo + Bluetooth radio. A 1A wall charger often isn't
-  enough; a 2S 18650 pack is. If you switch supplies, also revisit `DUTY_CAP`.
+  shares the supply with the servo + Bluetooth radio. A 1A wall charger isn't enough
+  for this, which is exactly why we use the 2S 18650 pack instead — double check
+  that's what's actually plugged into the jack, not a USB power bank or phone
+  charger.
 - **Creeps at rest:** deadzone too small — raise `DEADZONE`.
 - **Rudder backwards / off-center:** re-apply your E3 trims, or flip the sign of
   `cmd.steer`.

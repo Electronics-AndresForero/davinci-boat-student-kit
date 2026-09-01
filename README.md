@@ -62,7 +62,7 @@ control boot behavior — `phase0-bringup/` explains why.
 | Yellow TT motor (3–6 V) | 1 | **bench-test** motor for E2/E4/E5 |
 | 25GA-370 12 V gearmotor | 1 | the real paddle drive motor (final boat) |
 | MG90S servo | 1 | rudder |
-| 2S/3S 18650 pack + holder | 1 | propulsion power |
+| 2S 18650 pack + holder (7.4 V nominal, up to 8.4 V full charge) | 1 | propulsion power |
 | SPDT/toggle switches | 2 | mode + arm |
 | LED + 330 Ω resistor | 1 | status indicator |
 | USB-C/micro cable (data, not charge-only) | 1 | flashing + serial |

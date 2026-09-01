@@ -20,8 +20,9 @@ constexpr int STEER_CENTER_US = 1500, STEER_RANGE_US = 400;   // trim from E3
 // ---------- tunables ----------
 constexpr float DEADZONE      = 0.06f;   // use YOUR E1 value
 constexpr float THROTTLE_SLEW = 2.0f;    // max throttle change per second
-// SAFETY on the bench with a 12 V supply + TT motor: cap the output.
-constexpr float DUTY_CAP      = 0.40f;   // raise to 1.0 with the real 12 V motor
+// SAFETY on the bench with the TT motor: our 2S 18650 pack is 7.4 V (up to 8.4 V
+// full charge); 0.60 keeps the TT motor (3-6 V rated) comfortably under its max.
+constexpr float DUTY_CAP      = 0.60f;   // raise to 1.0 once you're on the real 12 V motor
 
 // ---------- the normalized command (the bus between input and actuators) ----------
 struct Command {

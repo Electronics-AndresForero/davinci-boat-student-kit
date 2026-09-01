@@ -13,7 +13,7 @@ constexpr int PIN_MODE_SWITCH=26, PIN_ARM_SWITCH=32;
 constexpr int MOT_FREQ=5000, MOT_BITS=10, MOT_MAX=(1<<MOT_BITS)-1;
 constexpr int SRV_FREQ=50, SRV_BITS=16, SRV_PERIOD_US=20000;
 constexpr int STEER_CENTER_US=1500, STEER_RANGE_US=400;
-constexpr float THROTTLE_SLEW=2.0f, DUTY_CAP=0.40f;
+constexpr float THROTTLE_SLEW=2.0f, DUTY_CAP=0.60f;  // tuned for the 2S 18650 pack (7.4 V)
 constexpr unsigned long FAILSAFE_MS=500;
 constexpr int RADIO_CHANNEL=1;                         // MUST match the handheld
 

@@ -78,8 +78,11 @@ it becomes the shared throttle-slew logic in E4.
 
 1. **Motor → M0.** Screw/plug the TT motor's two leads into the **M0** motor output.
    If it spins the wrong way during the test, swap the two leads.
-2. **Power → barrel jack, ~6 V** (ideally a bench supply with a ~1 A current limit).
-   USB stays connected for flashing and the console. **ON/OFF switch must be ON.**
+2. **Power → barrel jack, from the 2S 18650 pack** (two cells in series, 7.4 V
+   nominal, up to 8.4 V fully charged — this is our actual power source from here on,
+   not just a bench-test stand-in). A current-limited bench supply around 6 V works
+   too if you don't have the pack wired up yet. USB stays connected for flashing and
+   the console. **ON/OFF switch must be ON.**
 
 > **Safety:** first power-up, keep the motor **loose on the bench** (it'll hop). Hand
 > near the supply switch.
@@ -117,7 +120,7 @@ public:
 
 ### Checkpoint — how to know it's working
 
-Motor loose, ~6 V supply, upload. It should **spin up forward over ~1 s, hold ~2 s,
+Motor loose, 2S 18650 pack connected via the jack, upload. It should **spin up forward over ~1 s, hold ~2 s,
 ramp down to stop, then repeat in reverse** — smoothly, not snapping. A faint 5 kHz
 whine while running is normal (that's the PWM switching); **silence with no motion**
 is the bad sign. If it spins the wrong way first, that's a wiring/lead-polarity

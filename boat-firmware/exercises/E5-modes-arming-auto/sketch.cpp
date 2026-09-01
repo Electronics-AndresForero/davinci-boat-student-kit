@@ -14,7 +14,7 @@ constexpr int STEER_CENTER_US = 1500, STEER_RANGE_US = 400;
 
 constexpr float DEADZONE      = 0.06f;
 constexpr float THROTTLE_SLEW = 2.0f;
-constexpr float DUTY_CAP      = 0.40f;         // raise to 1.0 with the real 12 V motor
+constexpr float DUTY_CAP      = 0.60f;         // tuned for the 2S 18650 pack (7.4 V); raise to 1.0 on the real 12 V motor
 constexpr unsigned long FAILSAFE_MS = 500;     // stop if no fresh command within this
 
 struct Command { float throttle=0, steer=0; bool armed=false; unsigned long stamp=0; };

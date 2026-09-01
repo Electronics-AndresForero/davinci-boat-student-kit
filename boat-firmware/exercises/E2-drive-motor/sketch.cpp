@@ -15,8 +15,10 @@ constexpr int   PWM_FREQ = 5000;  // 5 kHz: what the SS6625E can actually follow
 constexpr int   PWM_BITS = 10;    // 10-bit resolution -> duty 0..1023
 constexpr int   PWM_MAX  = (1 << PWM_BITS) - 1;   // 1023
 
-// SAFETY: TT motor is 3-6 V. With a ~6 V supply, cap duty so we don't overdrive it.
-// Raise toward 1.0 only with the real 12 V motor on a 12 V pack.
+// SAFETY: TT motor is 3-6 V. Our 2S 18650 pack is 7.4 V nominal (up to 8.4 V full
+// charge) -- at 0.60 duty that's ~4.4-5.0 V, comfortably under the motor's 6 V max.
+// Raise toward 1.0 only once you're on the real 12 V motor (a 12 V-rated motor is
+// perfectly fine run under its rated voltage from this same 7.4 V pack).
 constexpr float TEST_DUTY_CAP = 0.60f;
 
 // ---- The drive: throttle in [-1, 1]; sign = direction, magnitude = speed ----
