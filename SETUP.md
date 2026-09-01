@@ -91,14 +91,16 @@ length you just fixed above. `C:\Electronics\` is a good, safe choice.
 cd C:\
 mkdir Electronics
 cd Electronics
-git clone --recursive https://github.com/Electronics-AndresForero/davinci-boat-student-kit.git
+git clone --recursive --shallow-submodules https://github.com/Electronics-AndresForero/davinci-boat-student-kit.git
 ```
 
 **`--recursive` matters** — this project bundles the Bluetooth library as a
-sub-project, and that flag fetches it too. If you forget it, run this from inside the
-cloned folder to fix it after the fact:
+sub-project, and that flag fetches it too. **`--shallow-submodules` matters too** —
+without it, git fetches that sub-project's *entire history* (a very slow, very large
+download); with it, you only get the current snapshot, which is all you need. If you
+forget either flag, run this from inside the cloned folder to fix it after the fact:
 ```powershell
-git submodule update --init --recursive
+git submodule update --init --recursive --depth 1
 ```
 
 This first clone downloads a fair amount of data (the Bluetooth library is large) —
@@ -188,14 +190,16 @@ finished — wait for it, then retry.
 ```bash
 cd ~/Documents
 mkdir -p Electronics && cd Electronics
-git clone --recursive https://github.com/Electronics-AndresForero/davinci-boat-student-kit.git
+git clone --recursive --shallow-submodules https://github.com/Electronics-AndresForero/davinci-boat-student-kit.git
 ```
 
 **`--recursive` matters** — it pulls in the Bluetooth library, which is bundled as a
-sub-project. If you forget it:
+sub-project. **`--shallow-submodules` matters too** — without it, git fetches that
+sub-project's *entire history* (a very slow, very large download) instead of just
+the current snapshot. If you forget either flag:
 ```bash
 cd davinci-boat-student-kit
-git submodule update --init --recursive
+git submodule update --init --recursive --depth 1
 ```
 
 This downloads a fair amount of data — give it a few minutes.
