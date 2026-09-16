@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "DaVinci Paddle Boat · del mando al agua",
+    "output": "/home/andresforero/Documents/Marymount/Roboticcs/2027_version/EIA_boat_2027/davinci-boat-student-kit/diagramas/cartel-sistema.archify.html",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "legend": { "mode": "hidden" }
+  },
+  "lanes": [
+    { "id": "propulsion", "label": "Propulsión" },
+    { "id": "gobierno", "label": "Gobierno" }
+  ],
+  "phases": [
+    { "id": "ph-mando", "label": "Mando", "fromCol": 0, "toCol": 0 },
+    { "id": "ph-fw", "label": "Firmware (ESP32)", "fromCol": 1, "toCol": 1, "variant": "emphasis" },
+    { "id": "ph-pot", "label": "Potencia", "fromCol": 2, "toCol": 2 },
+    { "id": "ph-mec", "label": "Mecánica (madera)", "fromCol": 3, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["pad", "esp", "power", "mech", "agua"],
+  "nodes": [
+    { "id": "pad", "lane": "propulsion", "col": 0, "type": "external", "label": "Mando Xbox", "sublabel": "Bluetooth", "width": 122 },
+    { "id": "esp", "lane": "propulsion", "col": 1, "type": "security", "label": "ESP32-WROOM-32E", "sublabel": "Bluepad32 · Command · FAILSAFE", "tag": "ARM · enlace 500 ms", "width": 186 },
+    { "id": "power", "lane": "propulsion", "col": 2, "type": "messagebus", "label": "Etapa de potencia", "sublabel": "PWM 0.60 · SS6625E · 250 rpm", "width": 178 },
+    { "id": "mech", "lane": "propulsion", "col": 3, "type": "backend", "label": "Engranajes MADERA 17 : 25", "sublabel": "2 ruedas Ø150 · 170 rpm", "width": 182 },
+    { "id": "agua", "lane": "propulsion", "col": 4, "type": "external", "label": "A G U A", "width": 104 },
+    { "id": "steer", "lane": "gobierno", "col": 2, "type": "messagebus", "label": "Pulso 1500 ± 400 µs", "sublabel": "Servo MG90S", "width": 150 },
+    { "id": "rudder", "lane": "gobierno", "col": 3, "type": "backend", "label": "Cuadrilátero 1:1", "sublabel": "→ Timón 24 × 44 · ±35°", "width": 168 }
+  ],
+  "edges": [
+    { "id": "e-pad", "from": "pad", "to": "esp", "label": "Bluetooth", "role": "main" },
+    { "id": "e-throttle", "from": "esp", "to": "power", "label": "throttle", "role": "main" },
+    { "id": "e-steer", "from": "esp", "to": "steer", "label": "steer", "role": "branch" },
+    { "id": "e-power", "from": "power", "to": "mech", "role": "main" },
+    { "id": "e-push", "from": "mech", "to": "agua", "label": "empuje 385 mN", "role": "main" },
+    { "id": "e-servo", "from": "steer", "to": "rudder", "role": "branch" },
+    { "id": "e-side", "from": "rudder", "to": "agua", "label": "fuerza lateral", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "orange",
+      "title": "CASCO",
+      "items": [
+        "370 × 140 × 70 mm · contrachapado 4 mm · astilla muerta 45°",
+        "Calado 55.9 / francobordo 14.1 mm · GM +25.2 mm",
+        "Costados planos: la quilla sube a proa para no doblar la madera fuera de plano"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "PROPULSIÓN",
+      "items": [
+        "Motor 250 rpm · engranajes 17:25 módulo 2 · rueda Ø150 de 6 palas",
+        "0.75 m/s · número de Froude 0.39",
+        "Engranajes en madera laminada, como pide la rúbrica"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "GOBIERNO",
+      "items": [
+        "Pala del timón 24 × 44 mm · compensación 20 % · recorrido ±35°",
+        "Varillaje cuadrilátero 1:1 · par en el servo 0.017 kg·cm",
+        "Brazos iguales: el timón gira exactamente lo que gira el servo"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "CONTROL",
+      "items": [
+        "ESP32-WROOM-32E · mando Xbox por Bluetooth · failsafe a 500 ms",
+        "Modo autónomo: tramo recto de 15 s · tope de PWM 0.60",
+        "El barco no se mueve si no está armado"
+      ]
+    }
+  ]
+}

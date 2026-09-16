@@ -66,7 +66,8 @@ void setup() {
   pinMode(PIN_LED, OUTPUT);
   drive.begin(); steer.begin();
   BP32.setup(&onConnect, &onDisconnect);
-  BP32.forgetBluetoothKeys(); BP32.enableVirtualDevice(false);
+  // BP32.forgetBluetoothKeys();  // E1 bring-up ONLY -- see E4. Leave commented out.
+  BP32.enableVirtualDevice(false);
   lastLoop = millis();
   Console.println("\n[E5] modes + arm + failsafe + autonomous. Boat on a stand!");
 }

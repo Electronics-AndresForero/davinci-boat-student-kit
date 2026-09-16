@@ -1,0 +1,23 @@
+flowchart LR
+    pad([Mando<br/>Xbox]) -->|Bluetooth| esp["ESP32-WROOM-32E<br/>Bluepad32"]
+    esp --> cmd{{"Command<br/>throttle · steer<br/>armed"}}
+    cmd --> fs["FAILSAFE<br/>interruptor ARM<br/>enlace &gt; 500 ms"]
+
+    fs -->|throttle| pw["PWM 5 kHz<br/>tope 0.60"]
+    pw --> dr[Driver<br/>SS6625E] --> mo[Motor<br/>250 rpm]
+    mo --> tr["Engranajes de MADERA<br/>17 : 25"] --> ru["2 ruedas de paletas<br/>Ø150 · 170 rpm"]
+    ru -->|"empuje 385 mN"| ag([A G U A])
+
+    fs -->|steer| us["pulso<br/>1500 ± 400 µs"]
+    us --> sv[Servo<br/>MG90S] --> cu["Cuadrilátero 1:1<br/>horn · biela · caña"]
+    cu --> ti["Timón compensado<br/>24 × 44 · ±35°"]
+    ti -->|"fuerza lateral"| ag
+
+    classDef sw fill:#e8f0f7,stroke:#24618c,stroke-width:2px,color:#12314a
+    classDef hw fill:#f7e4e0,stroke:#c0392b,stroke-width:2px,color:#5a1d14
+    classDef me fill:#f3e8d6,stroke:#8a4b2a,stroke-width:2px,color:#4a2716
+    classDef ex  fill:#e6efe8,stroke:#2e7d43,stroke-width:2.5px,color:#17381f
+    class esp,cmd,fs,pw,us sw
+    class dr,mo,sv hw
+    class tr,ru,cu,ti me
+    class pad,ag ex

@@ -1,0 +1,18 @@
+stateDiagram-v2
+    direction TB
+
+    state "MODO RC — interruptor MODE en HIGH" as RC {
+        direction LR
+        Desarmado --> Armado : ARM = LOW<br/>y dato del mando < 500 ms
+        Armado --> Desarmado : ARM = HIGH<br/>o enlace perdido
+    }
+
+    state "MODO AUTO — interruptor MODE en LOW" as AUTO {
+        direction LR
+        [*] --> Navegando : planner.arm()<br/>t0 = millis()
+        Navegando --> Parado : han pasado 15 s<br/>AUTO_RUN_MS
+    }
+
+    [*] --> RC
+    RC --> AUTO : flanco de MODE<br/>applied = 0
+    AUTO --> RC : flanco de MODE<br/>planner.disarm()

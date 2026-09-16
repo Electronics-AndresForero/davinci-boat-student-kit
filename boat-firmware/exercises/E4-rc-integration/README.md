@@ -129,9 +129,12 @@ void loop() {
 > ⚠️ **Both actuators are live now.** Put the boat/paddle assembly **on a stand with
 > the wheels off the ground**, and keep the rudder linkage clear.
 
-Pair the pad — LED goes solid. Squeeze RT: paddles ramp up forward, smoothly. Release:
-they ramp down. LT: reverse. Push the stick left/right: rudder swings **while the
-paddles keep spinning** — that simultaneity is the actual integration test. Turn the
+Switch the pad on — it should reconnect **by itself**, no Sync press, and the LED
+goes solid. (If this is the first boot after E1/E3, hold **Sync ~3 s** once to
+re-pair; from then on it's automatic — see Troubleshooting below.) Squeeze RT:
+paddles ramp up forward, smoothly. Release: they ramp down. LT: reverse. Push the
+stick left/right: rudder swings **while the paddles keep spinning** — that
+simultaneity is the actual integration test. Turn the
 controller off: the LED starts blinking and the motor stops (a preview of E5's
 failsafe).
 
@@ -168,6 +171,18 @@ correctly.
 Phase-specific traps — general tooling issues are in
 [../../../TROUBLESHOOTING.md](../../../TROUBLESHOOTING.md).
 
+- **Pad won't connect at all (E1 worked fine):** two causes, check in this order.
+  1. **Is the board actually running E4?** Open the serial monitor and hit reset — the
+     banner must read `[Phase 4] RC integration`. If it still says `[E3]`/`[Phase 3]`,
+     your upload didn't take and you're running E3, which never calls `BP32.setup()` —
+     so the ESP32 never enters discovery and *no* controller can connect. Re-upload.
+     (A common cause: the serial monitor holds the port, and Upload fails with
+     `Could not open ... the port is busy`. Close the monitor, then Upload.)
+  2. **Is `BP32.forgetBluetoothKeys()` still uncommented?** It deletes the ESP32's half
+     of the pairing on every boot while the pad keeps its half, so the pad's
+     auto-reconnect is refused and it blinks forever. E1 told you to comment it out
+     once pairing was reliable — do that now. After commenting it out you may need
+     **one** Sync press to clear the stale bond; it's automatic after that.
 - **Pairs but nothing moves:** re-confirm E2 basics — switch ON, the 2S 18650 pack
   connected via the jack (not just USB).
 - **Motor hums but won't turn (servo fine):** current starvation — the motor now

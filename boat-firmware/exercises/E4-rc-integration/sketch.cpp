@@ -64,7 +64,10 @@ void setup() {
   drive.begin();
   steer.begin();
   BP32.setup(&onConnect, &onDisconnect);
-  BP32.forgetBluetoothKeys();         // clean pairing during bring-up
+  // BP32.forgetBluetoothKeys();      // E1 bring-up ONLY -- leave commented out.
+  // It deletes the ESP32's half of the pairing on every boot while the pad keeps
+  // its half, so the pad's auto-reconnect gets refused. See this README's
+  // Troubleshooting: "Pad won't connect at all".
   BP32.enableVirtualDevice(false);
   lastLoop = millis();
   Console.println("\n[E4] RC integration. Board on a stand — wheels off the ground!");

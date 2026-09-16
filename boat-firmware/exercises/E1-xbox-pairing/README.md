@@ -179,7 +179,9 @@ not found) see [../../../TROUBLESHOOTING.md](../../../TROUBLESHOOTING.md).
   Fresh batteries, get close.
 - **Reconnect is slow every time:** that's `forgetBluetoothKeys()` doing its job
   (clean slate each boot). Once pairing is reliable, comment that line out and the
-  pad reconnects on its own.
+  pad reconnects on its own. **Don't carry that line forward into E4/E5** — from E4 on
+  you switch the pad on and expect it to reconnect, and this line makes that fail
+  every time.
 
 ## Concept check ✅
 

@@ -1,0 +1,30 @@
+---
+title: Del mando al agua
+---
+flowchart TB
+    pad([Mando Xbox]) -->|Bluetooth| bp["Bluepad32 → readController"]
+    bp --> cmd{{"Command<br/>throttle · steer · armed · stamp"}}
+    cmd --> fs["applyFailsafe<br/>ARM abierto, o dato de más de 500 ms<br/>→ armed = false"]
+
+    fs -->|throttle| pw["duty = throttle × DUTY_CAP 0.60<br/>con rampa de 2.0 por segundo<br/>ledcWrite · 5 kHz · 10 bits"]
+    fs -->|steer| us["pulso 1500 ± 400 µs"]
+
+    pw -->|0 a 8.4 V| dr[Driver SS6625E] --> mo[Motor 250 rpm]
+    us --> sv[Servo MG90S]
+
+    mo --> tr["Tren 17:25<br/>→ 170 rpm en el eje Ø6"]
+    tr --> ru[Rueda de paletas Ø150]
+    sv --> cu["Cuadrilátero 1:1<br/>horn · biela 45 · caña"]
+    cu --> ti[Timón ±35°]
+
+    ru -->|empuje 385 mN| ag([A G U A])
+    ti -->|fuerza lateral| ag
+
+    classDef sw fill:#e8f0f7,stroke:#24618c,stroke-width:1.5px,color:#12314a
+    classDef hw fill:#f7e4e0,stroke:#c0392b,stroke-width:1.5px,color:#5a1d14
+    classDef me fill:#f3e8d6,stroke:#8a4b2a,stroke-width:1.5px,color:#4a2716
+    classDef ex  fill:#e6efe8,stroke:#2e7d43,stroke-width:2px,color:#17381f
+    class bp,cmd,fs,pw,us sw
+    class dr,mo,sv hw
+    class tr,ru,cu,ti me
+    class pad,ag ex

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "E5 · Máquina de estados RC / AUTO",
+    "output": "/home/andresforero/Documents/Marymount/Roboticcs/2027_version/EIA_boat_2027/davinci-boat-student-kit/diagramas/estados-e5.archify.html",
+    "viewBox": [920, 566],
+    "animation": "trace",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    { "id": "main", "label": "Ciclo de la lancha" }
+  ],
+  "states": [
+    { "id": "boot", "type": "start", "label": "Encendido", "sublabel": "setup()", "lane": "main", "col": 0, "step": "00" },
+    { "id": "disarmed", "type": "waiting", "label": "Desarmado", "sublabel": "el gatillo no llega al motor", "lane": "main", "col": 1, "step": "01", "tag": "MODE = HIGH" },
+    { "id": "armed", "type": "active", "label": "Armado", "sublabel": "RC manda motor y timón", "lane": "main", "col": 2, "step": "02", "tag": "MODE = HIGH" },
+    { "id": "navigating", "type": "active", "label": "Navegando", "sublabel": "planner.arm() · t0 = millis()", "lane": "main", "col": 3, "step": "03", "tag": "MODE = LOW" },
+    { "id": "stopped", "type": "success", "label": "Parado", "sublabel": "pasaron 15 s · AUTO_RUN_MS", "lane": "main", "col": 4, "step": "04", "tag": "MODE = LOW" }
+  ],
+  "transitions": [
+    { "id": "t-boot", "from": "boot", "to": "disarmed" },
+    { "id": "t-arm", "from": "disarmed", "to": "armed", "label": "ARM = LOW · < 500 ms", "variant": "emphasis", "labelDy": 58 },
+    { "id": "t-mode-down", "from": "armed", "to": "navigating", "label": "MODE ↓ · applied = 0", "variant": "emphasis", "labelDy": -38 },
+    { "id": "t-run", "from": "navigating", "to": "stopped", "label": "15 s (AUTO_RUN_MS)", "labelDy": 58 },
+    { "id": "t-failsafe", "from": "armed", "to": "disarmed", "label": "ARM = HIGH o enlace perdido", "variant": "security", "route": "top-channel", "fromSide": "top", "toSide": "top" },
+    { "id": "t-mode-up", "from": "stopped", "to": "disarmed", "label": "flanco de MODE ↑ · planner.disarm()", "variant": "security", "route": "bottom-channel", "fromSide": "bottom", "toSide": "bottom" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "MODO RC (MODE = HIGH)",
+      "items": [
+        "Desarmado: el gatillo no llega al motor",
+        "Armar exige ARM = LOW y un dato del mando de hace menos de 500 ms",
+        "Perder el enlace 500 ms desarma solo"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "MODO AUTO (MODE = LOW)",
+      "items": [
+        "Entra siempre por Navegando: planner.arm(), t0 = millis()",
+        "Navega 15 s (AUTO_RUN_MS) y pasa a Parado",
+        "Volver MODE a HIGH en cualquier momento del tramo devuelve a Desarmado y llama planner.disarm()"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Lo que manda sobre todo",
+      "items": [
+        "El interruptor MODE elige el modo; su flanco reinicia applied = 0",
+        "ARM y el failsafe de 500 ms mandan sobre cualquier orden del mando",
+        "Sin armado el barco no se mueve"
+      ]
+    }
+  ]
+}

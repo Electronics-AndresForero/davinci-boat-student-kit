@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Del mando al agua",
+    "output": "/home/andresforero/Documents/Marymount/Roboticcs/2027_version/EIA_boat_2027/davinci-boat-student-kit/diagramas/cadena-mando-agua.archify.html",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "legend": { "mode": "hidden" }
+  },
+  "lanes": [
+    { "id": "mando", "label": "Mando" },
+    { "id": "firmware", "label": "Firmware (ESP32)" },
+    { "id": "electronica", "label": "Electrónica" },
+    { "id": "mecanica", "label": "Mecánica (madera)" }
+  ],
+  "mainPath": ["read", "fs", "duty", "driver", "drivetrain", "agua"],
+  "nodes": [
+    { "id": "pad", "lane": "mando", "col": 0, "type": "external", "label": "Mando Xbox", "sublabel": "Bluetooth", "width": 128 },
+    { "id": "read", "lane": "firmware", "col": 0, "type": "backend", "label": "Bluepad32", "sublabel": "readController → Command", "tag": "throttle · steer · armed", "width": 132 },
+    { "id": "fs", "lane": "firmware", "col": 1, "type": "security", "label": "applyFailsafe", "sublabel": "ARM abierto · dato > 500 ms", "tag": "→ armed = false", "width": 168 },
+    { "id": "duty", "lane": "firmware", "col": 2, "type": "backend", "label": "PWM propulsión", "sublabel": "duty × 0.60 · rampa 2/s · 5 kHz", "width": 180, "yOffset": -52 },
+    { "id": "pulse", "lane": "firmware", "col": 2, "type": "backend", "label": "Pulso timón", "sublabel": "1500 ± 400 µs", "width": 128, "yOffset": 52 },
+    { "id": "driver", "lane": "electronica", "col": 3, "type": "messagebus", "label": "Driver SS6625E", "sublabel": "0 – 8.4 V → Motor 250 rpm", "width": 140, "yOffset": -50 },
+    { "id": "servo", "lane": "electronica", "col": 3, "type": "messagebus", "label": "Servo MG90S", "width": 120, "yOffset": 50 },
+    { "id": "drivetrain", "lane": "mecanica", "col": 4, "type": "backend", "label": "Engranajes 17 : 25", "sublabel": "→ 170 rpm en eje Ø6 · Rueda Ø150", "width": 182, "yOffset": -50 },
+    { "id": "linkage", "lane": "mecanica", "col": 4, "type": "backend", "label": "Cuadrilátero 1:1", "sublabel": "horn · biela 45 · caña → Timón ±35°", "width": 150, "yOffset": 50 },
+    { "id": "agua", "lane": "mecanica", "col": 5, "type": "external", "label": "AGUA", "width": 104 }
+  ],
+  "edges": [
+    { "id": "e-pad", "from": "pad", "to": "read", "role": "main" },
+    { "id": "e-read", "from": "read", "to": "fs", "label": "Command", "role": "main" },
+    { "id": "e-throttle", "from": "fs", "to": "duty", "label": "throttle", "role": "main" },
+    { "id": "e-steer", "from": "fs", "to": "pulse", "label": "steer", "role": "branch" },
+    { "id": "e-duty", "from": "duty", "to": "driver", "role": "main" },
+    { "id": "e-pulse", "from": "pulse", "to": "servo", "role": "branch" },
+    { "id": "e-driver", "from": "driver", "to": "drivetrain", "label": "par motor", "role": "main" },
+    { "id": "e-servo", "from": "servo", "to": "linkage", "role": "branch" },
+    { "id": "e-push", "from": "drivetrain", "to": "agua", "label": "empuje 385 mN", "role": "main" },
+    { "id": "e-side", "from": "linkage", "to": "agua", "label": "fuerza lateral", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Firmware",
+      "items": [
+        "Un solo Command lleva throttle, steer, armed y la marca de tiempo",
+        "applyFailsafe puede anular cualquier orden: ARM abierto o enlace de más de 500 ms",
+        "El motor arranca con rampa y con tope permanente de 0.60"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Del cobre a la madera",
+      "items": [
+        "El driver entrega 0 – 8.4 V al motor de 250 rpm",
+        "Los engranajes van en madera laminada (lo pide la rúbrica): 17:25 → 170 rpm",
+        "Dos ruedas de paletas Ø150 dan 385 mN de empuje"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Gobierno",
+      "items": [
+        "El servo recibe un pulso de 1500 ± 400 µs",
+        "Cuadrilátero de brazos iguales: el timón gira lo mismo que el servo",
+        "Timón compensado 24 × 44 mm, recorrido ±35°"
+      ]
+    }
+  ]
+}
