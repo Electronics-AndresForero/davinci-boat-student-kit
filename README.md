@@ -8,6 +8,55 @@ boat you drive with an Xbox controller and switch into an autonomous run.
 microcontroller before, start at [SETUP.md](SETUP.md) — it walks through installing
 every tool from zero, on both Mac and Windows.
 
+**This repo is scoped to firmware/programming only** — no hull design, no BOM
+sourcing, no fabrication files. Clone it on its own and it's everything a
+student pair needs. It's also used as a git submodule inside the broader
+`EIA_boat_2027` project repo (hull design, drivetrain CAD, etc.), which
+references this repo alongside the mechanical work — but you don't need that
+repo to do any of the exercises below.
+
+## Repo structure: the `boat-firmware/template` submodule
+
+`boat-firmware/template/` is itself a **git submodule**, pinned to
+[Ricardo Quesada's ESP-IDF + Arduino + Bluepad32 template](https://github.com/ricardoquesada/esp-idf-arduino-bluepad32-template)
+— the build scaffolding (PlatformIO project, Bluepad32 component, examples)
+that every exercise builds on top of.
+
+**After cloning this repo, always run:**
+
+```
+git submodule update --init --recursive
+```
+
+(or clone with `git clone --recursive <this-repo-url>` in the first place) —
+otherwise `boat-firmware/template/` sits empty.
+
+**Before editing any file inside `boat-firmware/template/`** (most commonly
+`main/sketch.cpp`, once you're integrating exercises into the real boat's
+firmware), check out the custom branch first:
+
+```
+cd boat-firmware/template
+git checkout boat-firmware-custom
+```
+
+Skipping this leaves you on a **detached HEAD** — your edits still work locally,
+but they're not on any branch, so git can lose them (e.g. on garbage collection)
+the moment you check out something else. The submodule's `origin` remote points
+at the upstream template (someone else's public repo) — there's nowhere to push
+your own firmware changes to, so `boat-firmware-custom` only ever exists
+locally, as a safe place to commit. After committing there, go back to this
+repo's root and record the update:
+
+```
+cd ../..                      # back to davinci-boat-student-kit/
+git add boat-firmware/template
+git commit -m "..."
+```
+
+That second commit is what makes this repo "remember" which exact state of the
+template your firmware changes are pinned to.
+
 ## Do this first
 
 1. **[SETUP.md](SETUP.md)** — install VS Code, PlatformIO, and the one-time patch every
