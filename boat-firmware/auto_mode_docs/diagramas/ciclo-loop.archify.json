@@ -1,0 +1,255 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Un ciclo de loop() cada 10 ms",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "in",
+      "label": "Entradas"
+    },
+    {
+      "id": "logic",
+      "label": "Quién manda"
+    },
+    {
+      "id": "safe",
+      "label": "Seguridad"
+    },
+    {
+      "id": "out",
+      "label": "Salidas"
+    }
+  ],
+  "mainPath": [
+    "mpu",
+    "heading",
+    "autostep",
+    "kill",
+    "cap",
+    "motor"
+  ],
+  "nodes": [
+    {
+      "id": "mpu",
+      "lane": "in",
+      "col": 0,
+      "type": "external",
+      "label": "MPU-6050",
+      "sublabel": "giro en Z (°/s)",
+      "tag": "I2C 21/22",
+      "width": 112
+    },
+    {
+      "id": "autosw",
+      "lane": "in",
+      "col": 1,
+      "type": "external",
+      "label": "Switch AUTO",
+      "sublabel": "cerrado = autónomo",
+      "tag": "pin 26",
+      "width": 112
+    },
+    {
+      "id": "pad",
+      "lane": "in",
+      "col": 2,
+      "type": "external",
+      "label": "Mando Xbox",
+      "sublabel": "gatillos + stick",
+      "tag": "Bluetooth",
+      "width": 112
+    },
+    {
+      "id": "armsw",
+      "lane": "in",
+      "col": 3,
+      "type": "external",
+      "label": "Switch ARM",
+      "sublabel": "cerrado = armado",
+      "tag": "pin 32",
+      "width": 112
+    },
+    {
+      "id": "heading",
+      "lane": "logic",
+      "col": 0,
+      "type": "backend",
+      "label": "updateHeading",
+      "sublabel": "rumbo += giro × dt",
+      "width": 112
+    },
+    {
+      "id": "autostep",
+      "lane": "logic",
+      "col": 1,
+      "type": "backend",
+      "label": "autoStep",
+      "sublabel": "máquina de estados",
+      "tag": "si AUTO activo",
+      "width": 112
+    },
+    {
+      "id": "rc",
+      "lane": "logic",
+      "col": 2,
+      "type": "backend",
+      "label": "readController",
+      "sublabel": "si AUTO abierto",
+      "width": 112
+    },
+    {
+      "id": "kill",
+      "lane": "safe",
+      "col": 3,
+      "type": "security",
+      "label": "¿Armado?",
+      "sublabel": "ARM abierto → armed = false",
+      "tag": "manda siempre",
+      "width": 112
+    },
+    {
+      "id": "cap",
+      "lane": "safe",
+      "col": 4,
+      "type": "security",
+      "label": "Tope y rampa",
+      "sublabel": "× 0.80 · 4 por s",
+      "width": 112
+    },
+    {
+      "id": "servo",
+      "lane": "out",
+      "col": 3,
+      "type": "frontend",
+      "label": "Timón (servo)",
+      "sublabel": "1500 ± 750 µs",
+      "tag": "pin 25",
+      "width": 112
+    },
+    {
+      "id": "motor",
+      "lane": "out",
+      "col": 4,
+      "type": "frontend",
+      "label": "Motor de palas",
+      "sublabel": "PWM 5 kHz",
+      "tag": "pines 27/13",
+      "width": 112
+    },
+    {
+      "id": "log",
+      "lane": "out",
+      "col": 5,
+      "type": "database",
+      "label": "Log en flash",
+      "sublabel": "/log.csv · 20 Hz",
+      "tag": "LittleFS",
+      "width": 112
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-mpu",
+      "from": "mpu",
+      "to": "heading",
+      "label": "gyro Z",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-heading",
+      "from": "heading",
+      "to": "autostep",
+      "label": "rumbo",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-autosw",
+      "from": "autosw",
+      "to": "autostep",
+      "label": "flanco: reinicia"
+    },
+    {
+      "id": "e-pad",
+      "from": "pad",
+      "to": "rc"
+    },
+    {
+      "id": "e-auto-cmd",
+      "from": "autostep",
+      "to": "kill",
+      "label": "Command",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-rc-cmd",
+      "from": "rc",
+      "to": "kill",
+      "label": "Command"
+    },
+    {
+      "id": "e-arm",
+      "from": "armsw",
+      "to": "kill",
+      "variant": "security"
+    },
+    {
+      "id": "e-cap",
+      "from": "kill",
+      "to": "cap",
+      "label": "throttle",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-servo",
+      "from": "kill",
+      "to": "servo",
+      "label": "steer"
+    },
+    {
+      "id": "e-motor",
+      "from": "cap",
+      "to": "motor",
+      "label": "applied",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-log",
+      "from": "cap",
+      "to": "log",
+      "label": "duty",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Un solo camino",
+      "items": [
+        "RC y autónomo llenan el mismo Command",
+        "Ambos pasan por la misma seguridad y el mismo tope",
+        "Los actuadores no saben quién dio la orden"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "ARM manda siempre",
+      "items": [
+        "Con ARM abierto, armed = false en cualquier modo",
+        "También apaga la secuencia autónoma",
+        "Motor a 0 y timón al centro"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Duty real",
+      "items": [
+        "applied = throttle × 0.80, con rampa de 4 por segundo",
+        "Es lo que se guarda en la columna duty del log",
+        "Con menos de 80 % el barco no se mueve"
+      ]
+    }
+  ]
+}

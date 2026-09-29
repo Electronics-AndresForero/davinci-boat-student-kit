@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Estados del modo autónomo",
+    "viewBox": [
+      980,
+      660
+    ],
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Secuencia autónoma"
+    },
+    {
+      "id": "stop",
+      "label": "Paro de seguridad"
+    }
+  ],
+  "states": [
+    {
+      "id": "espera",
+      "type": "start",
+      "label": "Espera",
+      "sublabel": "modo RC",
+      "lane": "main",
+      "col": 0,
+      "step": "00",
+      "tag": "AUTO abierto"
+    },
+    {
+      "id": "recto1",
+      "type": "active",
+      "label": "Recto 1",
+      "sublabel": "mantiene rumbo",
+      "lane": "main",
+      "col": 1,
+      "step": "01",
+      "tag": "STRAIGHT1"
+    },
+    {
+      "id": "giro",
+      "type": "decision",
+      "label": "Giro",
+      "sublabel": "rodea la boya",
+      "lane": "main",
+      "col": 2,
+      "step": "02",
+      "tag": "TURN"
+    },
+    {
+      "id": "recto2",
+      "type": "active",
+      "label": "Recto 2",
+      "sublabel": "nuevo rumbo",
+      "lane": "main",
+      "col": 3,
+      "step": "03",
+      "tag": "STRAIGHT2"
+    },
+    {
+      "id": "fin",
+      "type": "success",
+      "label": "Fin",
+      "sublabel": "motor en 0",
+      "lane": "main",
+      "col": 4,
+      "step": "04",
+      "tag": "DONE"
+    },
+    {
+      "id": "desarmado",
+      "type": "failure",
+      "label": "Desarmado",
+      "sublabel": "interruptor ARM abierto",
+      "lane": "stop",
+      "col": 2,
+      "tag": "kill switch"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t-inicio",
+      "from": "espera",
+      "to": "recto1",
+      "variant": "emphasis",
+      "label": "cierra AUTO",
+      "labelDy": -25
+    },
+    {
+      "id": "t-recto1",
+      "from": "recto1",
+      "to": "giro",
+      "label": "pasan 4 s",
+      "labelDy": -25
+    },
+    {
+      "id": "t-giro",
+      "from": "giro",
+      "to": "recto2",
+      "label": "70° o 3 s",
+      "labelDy": -25
+    },
+    {
+      "id": "t-recto2",
+      "from": "recto2",
+      "to": "fin",
+      "label": "pasan 5 s",
+      "labelDy": -25
+    },
+    {
+      "id": "t-kill",
+      "from": "giro",
+      "to": "desarmado",
+      "variant": "security",
+      "route": "drop",
+      "label": "ARM abierto (en cualquier estado)"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Quién decide qué",
+      "items": [
+        "El giroscopio decide CÓMO se ejecuta cada tramo",
+        "Un temporizador decide CUÁNDO empieza el giro",
+        "El giro termina al medir 70° (o a los 3 s si el sensor falla)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "En cada tramo",
+      "items": [
+        "Throttle 1.0 × DUTY_CAP 0.80 = 80 % de duty",
+        "Recto: steer = −KP × (rumbo − referencia)",
+        "Giro: steer fijo en +0.6"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Seguridad",
+      "items": [
+        "ARM abierto apaga el motor desde cualquier estado",
+        "Abrir AUTO devuelve el control al mando RC",
+        "Al cerrar AUTO otra vez, la secuencia reinicia en Recto 1"
+      ]
+    }
+  ]
+}

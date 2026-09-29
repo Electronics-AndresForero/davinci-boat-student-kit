@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Del agua al análisis: el log sin cable",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      520
+    ]
+  },
+  "stages": [
+    {
+      "label": "Datos del barco"
+    },
+    {
+      "label": "Firmware"
+    },
+    {
+      "label": "Memoria flash"
+    },
+    {
+      "label": "Con USB"
+    },
+    {
+      "label": "En el PC"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "mpu",
+      "type": "external",
+      "label": "MPU-6050",
+      "sublabel": "giro y rumbo",
+      "stage": 0,
+      "row": 0,
+      "tag": "durante la prueba"
+    },
+    {
+      "id": "cmd",
+      "type": "frontend",
+      "label": "Command",
+      "sublabel": "throttle · steer · duty",
+      "stage": 0,
+      "row": 1
+    },
+    {
+      "id": "logrow",
+      "type": "backend",
+      "label": "logRow()",
+      "sublabel": "1 fila cada 50 ms",
+      "stage": 1,
+      "row": 0,
+      "tag": "20 Hz"
+    },
+    {
+      "id": "flash",
+      "type": "database",
+      "label": "/log.csv",
+      "sublabel": "LittleFS en el ESP32",
+      "stage": 2,
+      "row": 0,
+      "tag": "flush cada 1 s"
+    },
+    {
+      "id": "dump",
+      "type": "backend",
+      "label": "Volcado en setup()",
+      "sublabel": "imprime y borra",
+      "stage": 3,
+      "row": 0,
+      "tag": "por Console"
+    },
+    {
+      "id": "monitor",
+      "type": "external",
+      "label": "Monitor serial",
+      "sublabel": "guardar captura.txt",
+      "stage": 3,
+      "row": 1,
+      "tag": "abrirlo ANTES"
+    },
+    {
+      "id": "analizar",
+      "type": "backend",
+      "label": "analizar_log.py",
+      "sublabel": "tramos y giros",
+      "stage": 4,
+      "row": 0
+    },
+    {
+      "id": "consts",
+      "type": "database",
+      "label": "Constantes",
+      "sublabel": "KP · 70° · tiempos",
+      "stage": 4,
+      "row": 1,
+      "tag": "a pegar en el sketch"
+    }
+  ],
+  "flows": [
+    {
+      "from": "mpu",
+      "to": "logrow",
+      "label": "gyro_z, heading",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "from": "cmd",
+      "to": "logrow",
+      "label": "modo, steer, duty"
+    },
+    {
+      "from": "logrow",
+      "to": "flash",
+      "label": "fila CSV",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "from": "flash",
+      "to": "dump",
+      "label": "al reiniciar",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "from": "dump",
+      "to": "monitor",
+      "label": "LOG_START…LOG_END",
+      "labelDy": 24
+    },
+    {
+      "from": "monitor",
+      "to": "analizar",
+      "label": "captura.txt",
+      "variant": "emphasis"
+    },
+    {
+      "from": "analizar",
+      "to": "consts",
+      "label": "propone valores",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Sin cable en el agua",
+      "items": [
+        "Las filas se guardan en la flash interna mientras navega",
+        "Solo se sacan al conectar el USB, ya fuera del agua",
+        "Se pierde como máximo el último segundo si se corta la energía"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Cuidado",
+      "items": [
+        "El volcado borra el archivo después de imprimirlo",
+        "Reiniciar sin el monitor abierto pierde esa corrida",
+        "Guarda captura.txt antes de volver a probar"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Columnas",
+      "items": [
+        "t_ms, modo, throttle, steer",
+        "gyro_z_dps, heading_deg",
+        "duty: el ciclo de trabajo real ya con el tope 0.80"
+      ]
+    }
+  ]
+}
