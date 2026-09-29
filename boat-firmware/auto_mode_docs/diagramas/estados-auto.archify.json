@@ -7,7 +7,10 @@
       980,
       660
     ],
-    "quality_profile": "showcase"
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "hidden"
+    }
   },
   "lanes": [
     {
@@ -17,6 +20,10 @@
     {
       "id": "stop",
       "label": "Paro de seguridad"
+    },
+    {
+      "id": "terminal",
+      "label": "Final"
     }
   ],
   "states": [
@@ -65,8 +72,8 @@
       "type": "success",
       "label": "Fin",
       "sublabel": "motor en 0",
-      "lane": "main",
-      "col": 4,
+      "lane": "terminal",
+      "col": 2,
       "step": "04",
       "tag": "DONE"
     },
@@ -76,7 +83,7 @@
       "label": "Desarmado",
       "sublabel": "interruptor ARM abierto",
       "lane": "stop",
-      "col": 2,
+      "col": 0,
       "tag": "kill switch"
     }
   ],
@@ -107,45 +114,16 @@
       "id": "t-recto2",
       "from": "recto2",
       "to": "fin",
-      "label": "pasan 5 s",
-      "labelDy": -25
+      "label": "pasan 5 s"
     },
     {
       "id": "t-kill",
       "from": "giro",
       "to": "desarmado",
       "variant": "security",
-      "route": "drop",
-      "label": "ARM abierto (en cualquier estado)"
-    }
-  ],
-  "cards": [
-    {
-      "dot": "cyan",
-      "title": "Quién decide qué",
-      "items": [
-        "El giroscopio decide CÓMO se ejecuta cada tramo",
-        "Un temporizador decide CUÁNDO empieza el giro",
-        "El giro termina al medir 70° (o a los 3 s si el sensor falla)"
-      ]
-    },
-    {
-      "dot": "emerald",
-      "title": "En cada tramo",
-      "items": [
-        "Throttle 1.0 × DUTY_CAP 0.80 = 80 % de duty",
-        "Recto: steer = −KP × (rumbo − referencia)",
-        "Giro: steer fijo en +0.6"
-      ]
-    },
-    {
-      "dot": "rose",
-      "title": "Seguridad",
-      "items": [
-        "ARM abierto apaga el motor desde cualquier estado",
-        "Abrir AUTO devuelve el control al mando RC",
-        "Al cerrar AUTO otra vez, la secuencia reinicia en Recto 1"
-      ]
+      "route": "straight",
+      "label": "ARM abierto (en cualquier estado)",
+      "labelDy": 24
     }
   ]
 }

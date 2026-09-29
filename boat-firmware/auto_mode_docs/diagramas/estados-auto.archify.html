@@ -5035,17 +5035,17 @@
         <path d="M 72 264 L 908 264" class="a-default" stroke-width="0.8" stroke-dasharray="3,8"/>
         <text x="72" y="252" class="t-dim" font-size="10" font-weight="600">02 / Paro de seguridad</text>
         <path d="M 72 436 L 908 436" class="a-default" stroke-width="0.8" stroke-dasharray="3,8"/>
-        <text x="72" y="424" class="t-dim" font-size="10" font-weight="600">03 / Outcomes</text>
+        <text x="72" y="424" class="t-dim" font-size="10" font-weight="600">03 / Final</text>
 
         <!-- Primary lifecycle rail -->
-        <path d="M 154 157 L 748 157" class="a-emphasis" stroke-width="2.2" marker-end="url(#arrowhead-emphasis)"/>
+        <path d="M 154 157 L 594 157" class="a-emphasis" stroke-width="2.2" marker-end="url(#arrowhead-emphasis)"/>
 
         <!-- Transition paths -->
         <path data-edge-from="espera" data-edge-to="recto1" data-edge-label="cierra AUTO" data-edge-key="0" data-edge-id="t-inicio" data-composition-points="153,157;189,157" d="M 153 157 L 189 157" class="a-emphasis" stroke-width="2" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="recto1" data-edge-to="giro" data-edge-label="pasan 4 s" data-edge-key="1" data-edge-id="t-recto1" data-composition-points="307,157;343,157" d="M 307 157 L 343 157" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
         <path data-edge-from="giro" data-edge-to="recto2" data-edge-label="70° o 3 s" data-edge-key="2" data-edge-id="t-giro" data-composition-points="461,157;497,157" d="M 461 157 L 497 157" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="recto2" data-edge-to="fin" data-edge-label="pasan 5 s" data-edge-key="3" data-edge-id="t-recto2" data-composition-points="615,157;651,157" d="M 615 157 L 651 157" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="giro" data-edge-to="desarmado" data-edge-label="ARM abierto (en cualquier estado)" data-edge-key="4" data-edge-id="t-kill" data-composition-points="461,157;461,232;647,232;647,307" d="M 461 157 L 461 222 Q 461 232 471 232 L 637 232 Q 647 232 647 242 L 647 307" class="a-security" stroke-width="1.1" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="recto2" data-edge-to="fin" data-edge-label="pasan 5 s" data-edge-key="3" data-edge-id="t-recto2" data-composition-points="615,157;633,157;633,479;651,479" d="M 615 157 L 624 157 Q 633 157 633 166 L 633 470 Q 633 479 642 479 L 651 479" class="a-default" stroke-width="1.1" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="giro" data-edge-to="desarmado" data-edge-label="ARM abierto (en cualquier estado)" data-edge-key="4" data-edge-id="t-kill" data-composition-points="402,188;402,278" d="M 402 188 L 402 278" class="a-security" stroke-width="1.1" marker-end="url(#arrowhead-security)"/>
 
         <!-- States -->
         <g id="node-espera" data-node-id="espera" data-node-label="Espera" tabindex="0" role="button" aria-label="Focus Espera, modo RC, Secuencia autónoma" aria-pressed="false" data-node-kind="start" data-node-sublabel="modo RC" data-node-tag="AUTO abierto" data-node-context="Secuencia autónoma">
@@ -5102,31 +5102,31 @@
         <text data-detail="fine" x="556" y="177" class="t-backend" font-size="7" text-anchor="middle">STRAIGHT2</text>
         </g>
 
-        <g id="node-fin" data-node-id="fin" data-node-label="Fin" tabindex="0" role="button" aria-label="Focus Fin, motor en 0, Secuencia autónoma" aria-pressed="false" data-node-kind="success" data-node-sublabel="motor en 0" data-node-tag="DONE" data-node-context="Secuencia autónoma">
-          <title>Fin · motor en 0 · Secuencia autónoma · DONE</title>
-          <rect x="651" y="126" width="118" height="62" rx="7" class="c-mask"/>
-          <rect x="651" y="126" width="118" height="62" rx="7" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="success" class="semantic-sigil s-database" transform="translate(752 132) scale(0.6875)">
+        <g id="node-fin" data-node-id="fin" data-node-label="Fin" tabindex="0" role="button" aria-label="Focus Fin, motor en 0, Final" aria-pressed="false" data-node-kind="success" data-node-sublabel="motor en 0" data-node-tag="DONE" data-node-context="Final">
+          <title>Fin · motor en 0 · Final · DONE</title>
+          <rect x="651" y="450" width="118" height="58" rx="7" class="c-mask"/>
+          <rect x="651" y="450" width="118" height="58" rx="7" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="success" class="semantic-sigil s-database" transform="translate(752 456) scale(0.6875)">
             <circle cx="8" cy="8" r="5.3"/>
             <path d="m5.2 8 1.8 1.8 3.8-4"/>
           </g>
-        <text data-detail="fine" x="661" y="140" class="t-database" font-size="7" font-weight="700">04</text>
-          <text data-node-label="" data-detail-anchor="" x="710" y="147" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Fin</text>
-          <text data-detail="context" x="710" y="163" class="t-muted" font-size="7" text-anchor="middle">motor en 0</text>
-        <text data-detail="fine" x="710" y="177" class="t-database" font-size="7" text-anchor="middle">DONE</text>
+        <text data-detail="fine" x="661" y="464" class="t-database" font-size="7" font-weight="700">04</text>
+          <text data-node-label="" data-detail-anchor="" x="710" y="471" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Fin</text>
+          <text data-detail="context" x="710" y="487" class="t-muted" font-size="7" text-anchor="middle">motor en 0</text>
+        <text data-detail="fine" x="710" y="497" class="t-database" font-size="7" text-anchor="middle">DONE</text>
         </g>
 
         <g id="node-desarmado" data-node-id="desarmado" data-node-label="Desarmado" tabindex="0" role="button" aria-label="Focus Desarmado, interruptor ARM abierto, Paro de seguridad" aria-pressed="false" data-node-kind="failure" data-node-sublabel="interruptor ARM abierto" data-node-tag="kill switch" data-node-context="Paro de seguridad">
           <title>Desarmado · interruptor ARM abierto · Paro de seguridad · kill switch</title>
-          <rect x="647" y="278" width="126" height="58" rx="7" class="c-mask"/>
-          <rect x="647" y="278" width="126" height="58" rx="7" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(756 284) scale(0.6875)">
+          <rect x="339" y="278" width="126" height="58" rx="7" class="c-mask"/>
+          <rect x="339" y="278" width="126" height="58" rx="7" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(448 284) scale(0.6875)">
             <circle cx="8" cy="8" r="5.3"/>
             <path d="m5.7 5.7 4.6 4.6m0-4.6-4.6 4.6"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="710" y="299" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Desarmado</text>
-          <text data-detail="context" x="710" y="315" class="t-muted" font-size="7" text-anchor="middle">interruptor ARM abierto</text>
-        <text data-detail="fine" x="710" y="325" class="t-security" font-size="7" text-anchor="middle">kill switch</text>
+          <text data-node-label="" data-detail-anchor="" x="402" y="299" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Desarmado</text>
+          <text data-detail="context" x="402" y="315" class="t-muted" font-size="7" text-anchor="middle">interruptor ARM abierto</text>
+        <text data-detail="fine" x="402" y="325" class="t-security" font-size="7" text-anchor="middle">kill switch</text>
         </g>
 
         <!-- Transition labels -->
@@ -5143,38 +5143,16 @@
           <text x="479" y="122" class="t-muted" font-size="8" text-anchor="middle">70° o 3 s</text>
         </g>
         <g data-detail="context" data-edge-from="recto2" data-edge-to="fin" data-edge-label="pasan 5 s" data-edge-key="3" data-edge-id="t-recto2">
-          <rect x="604.95" y="111" width="56.1" height="16" rx="4" class="c-mask"/>
-          <text x="633" y="122" class="t-muted" font-size="8" text-anchor="middle">pasan 5 s</text>
+          <rect x="604.95" y="297" width="56.1" height="16" rx="4" class="c-mask"/>
+          <text x="633" y="308" class="t-muted" font-size="8" text-anchor="middle">pasan 5 s</text>
         </g>
         <g data-detail="context" data-edge-from="giro" data-edge-to="desarmado" data-edge-label="ARM abierto (en cualquier estado)" data-edge-key="4" data-edge-id="t-kill">
-          <rect x="467.15" y="211" width="173.70000000000002" height="16" rx="4" class="c-mask"/>
-          <text x="554" y="222" class="t-security" font-size="8" text-anchor="middle">ARM abierto (en cualquier estado)</text>
+          <rect x="315.15" y="191" width="173.70000000000002" height="16" rx="4" class="c-mask"/>
+          <text x="402" y="202" class="t-security" font-size="8" text-anchor="middle">ARM abierto (en cualquier estado)</text>
         </g>
 
         <!-- Legend -->
-        <g data-legend="" data-legend-bridge="">
-          <text x="40" y="604" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="start" data-legend-kind="start" data-legend-label="start" data-legend-x="40" data-legend-baseline="624" data-legend-width="68">
-            <rect x="40" y="616" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
-            <text x="62" y="624" class="t-muted" font-size="10" font-weight="500">start</text>
-          </g>
-          <g data-legend-semantic-kind="active" data-legend-kind="active" data-legend-label="active state" data-legend-x="130" data-legend-baseline="624" data-legend-width="103">
-            <rect x="130" y="616" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
-            <text x="152" y="624" class="t-muted" font-size="10" font-weight="500">active state</text>
-          </g>
-          <g data-legend-semantic-kind="decision" data-legend-kind="decision" data-legend-label="decision" data-legend-x="255" data-legend-baseline="624" data-legend-width="83">
-            <rect x="255" y="616" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-            <text x="277" y="624" class="t-muted" font-size="10" font-weight="500">decision</text>
-          </g>
-          <g data-legend-semantic-kind="success" data-legend-kind="success" data-legend-label="terminal success" data-legend-x="360" data-legend-baseline="624" data-legend-width="123">
-            <rect x="360" y="616" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
-            <text x="382" y="624" class="t-muted" font-size="10" font-weight="500">terminal success</text>
-          </g>
-          <g data-legend-semantic-kind="failure" data-legend-kind="failure" data-legend-label="failure / exit" data-legend-x="505" data-legend-baseline="624" data-legend-width="113">
-            <rect x="505" y="616" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-            <text x="527" y="624" class="t-muted" font-size="10" font-weight="500">failure / exit</text>
-          </g>
-        </g>
+
       </svg>
       <p class="intent-trace-status no-print" id="intent-trace-status" role="status" aria-live="polite" aria-atomic="true"></p>
       <div class="share-chapter-cue no-print" id="share-chapter-cue" hidden role="status" aria-live="polite">
@@ -5361,41 +5339,7 @@
 
     <!-- Info Cards -->
     <div class="cards">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-dot cyan"></div>
-          <h3>Quién decide qué</h3>
-        </div>
-        <ul>
-          <li>&bull; El giroscopio decide CÓMO se ejecuta cada tramo</li>
-          <li>&bull; Un temporizador decide CUÁNDO empieza el giro</li>
-          <li>&bull; El giro termina al medir 70° (o a los 3 s si el sensor falla)</li>
-        </ul>
-      </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div class="card-dot emerald"></div>
-          <h3>En cada tramo</h3>
-        </div>
-        <ul>
-          <li>&bull; Throttle 1.0 × DUTY_CAP 0.80 = 80 % de duty</li>
-          <li>&bull; Recto: steer = −KP × (rumbo − referencia)</li>
-          <li>&bull; Giro: steer fijo en +0.6</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-dot rose"></div>
-          <h3>Seguridad</h3>
-        </div>
-        <ul>
-          <li>&bull; ARM abierto apaga el motor desde cualquier estado</li>
-          <li>&bull; Abrir AUTO devuelve el control al mando RC</li>
-          <li>&bull; Al cerrar AUTO otra vez, la secuencia reinicia en Recto 1</li>
-        </ul>
-      </div>
     </div>
 
   </div>

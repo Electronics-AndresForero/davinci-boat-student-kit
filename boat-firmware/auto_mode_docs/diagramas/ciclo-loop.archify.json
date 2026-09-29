@@ -3,24 +3,23 @@
   "diagram_type": "workflow",
   "meta": {
     "title": "Un ciclo de loop() cada 10 ms",
-    "quality_profile": "showcase"
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "hidden"
+    }
   },
   "lanes": [
     {
-      "id": "in",
-      "label": "Entradas"
+      "id": "auto",
+      "label": "Modo autónomo"
     },
     {
-      "id": "logic",
-      "label": "Quién manda"
+      "id": "main",
+      "label": "Mando, seguridad y motor"
     },
     {
-      "id": "safe",
-      "label": "Seguridad"
-    },
-    {
-      "id": "out",
-      "label": "Salidas"
+      "id": "aux",
+      "label": "Timón y registro"
     }
   ],
   "mainPath": [
@@ -34,7 +33,7 @@
   "nodes": [
     {
       "id": "mpu",
-      "lane": "in",
+      "lane": "auto",
       "col": 0,
       "type": "external",
       "label": "MPU-6050",
@@ -43,39 +42,9 @@
       "width": 112
     },
     {
-      "id": "autosw",
-      "lane": "in",
-      "col": 1,
-      "type": "external",
-      "label": "Switch AUTO",
-      "sublabel": "cerrado = autónomo",
-      "tag": "pin 26",
-      "width": 112
-    },
-    {
-      "id": "pad",
-      "lane": "in",
-      "col": 2,
-      "type": "external",
-      "label": "Mando Xbox",
-      "sublabel": "gatillos + stick",
-      "tag": "Bluetooth",
-      "width": 112
-    },
-    {
-      "id": "armsw",
-      "lane": "in",
-      "col": 3,
-      "type": "external",
-      "label": "Switch ARM",
-      "sublabel": "cerrado = armado",
-      "tag": "pin 32",
-      "width": 112
-    },
-    {
       "id": "heading",
-      "lane": "logic",
-      "col": 0,
+      "lane": "auto",
+      "col": 1,
       "type": "backend",
       "label": "updateHeading",
       "sublabel": "rumbo += giro × dt",
@@ -83,36 +52,37 @@
     },
     {
       "id": "autostep",
-      "lane": "logic",
-      "col": 1,
+      "lane": "auto",
+      "col": 2,
       "type": "backend",
       "label": "autoStep",
       "sublabel": "máquina de estados",
-      "tag": "si AUTO activo",
+      "tag": "switch AUTO cerrado",
       "width": 112
     },
     {
       "id": "rc",
-      "lane": "logic",
+      "lane": "main",
       "col": 2,
       "type": "backend",
       "label": "readController",
-      "sublabel": "si AUTO abierto",
+      "sublabel": "gatillos + stick",
+      "tag": "switch AUTO abierto",
       "width": 112
     },
     {
       "id": "kill",
-      "lane": "safe",
+      "lane": "main",
       "col": 3,
       "type": "security",
       "label": "¿Armado?",
-      "sublabel": "ARM abierto → armed = false",
+      "sublabel": "ARM abierto → paro",
       "tag": "manda siempre",
       "width": 112
     },
     {
       "id": "cap",
-      "lane": "safe",
+      "lane": "main",
       "col": 4,
       "type": "security",
       "label": "Tope y rampa",
@@ -120,8 +90,18 @@
       "width": 112
     },
     {
+      "id": "motor",
+      "lane": "main",
+      "col": 5,
+      "type": "frontend",
+      "label": "Motor de palas",
+      "sublabel": "PWM 5 kHz",
+      "tag": "pines 27/13",
+      "width": 112
+    },
+    {
       "id": "servo",
-      "lane": "out",
+      "lane": "aux",
       "col": 3,
       "type": "frontend",
       "label": "Timón (servo)",
@@ -130,19 +110,9 @@
       "width": 112
     },
     {
-      "id": "motor",
-      "lane": "out",
-      "col": 4,
-      "type": "frontend",
-      "label": "Motor de palas",
-      "sublabel": "PWM 5 kHz",
-      "tag": "pines 27/13",
-      "width": 112
-    },
-    {
       "id": "log",
-      "lane": "out",
-      "col": 5,
+      "lane": "aux",
+      "col": 4,
       "type": "database",
       "label": "Log en flash",
       "sublabel": "/log.csv · 20 Hz",
@@ -155,7 +125,7 @@
       "id": "e-mpu",
       "from": "mpu",
       "to": "heading",
-      "label": "gyro Z",
+      "label": "giro Z",
       "variant": "emphasis"
     },
     {
@@ -164,17 +134,6 @@
       "to": "autostep",
       "label": "rumbo",
       "variant": "emphasis"
-    },
-    {
-      "id": "e-autosw",
-      "from": "autosw",
-      "to": "autostep",
-      "label": "flanco: reinicia"
-    },
-    {
-      "id": "e-pad",
-      "from": "pad",
-      "to": "rc"
     },
     {
       "id": "e-auto-cmd",
@@ -190,23 +149,11 @@
       "label": "Command"
     },
     {
-      "id": "e-arm",
-      "from": "armsw",
-      "to": "kill",
-      "variant": "security"
-    },
-    {
       "id": "e-cap",
       "from": "kill",
       "to": "cap",
       "label": "throttle",
       "variant": "emphasis"
-    },
-    {
-      "id": "e-servo",
-      "from": "kill",
-      "to": "servo",
-      "label": "steer"
     },
     {
       "id": "e-motor",
@@ -216,40 +163,17 @@
       "variant": "emphasis"
     },
     {
+      "id": "e-servo",
+      "from": "kill",
+      "to": "servo",
+      "label": "steer"
+    },
+    {
       "id": "e-log",
       "from": "cap",
       "to": "log",
       "label": "duty",
       "variant": "dashed"
-    }
-  ],
-  "cards": [
-    {
-      "dot": "cyan",
-      "title": "Un solo camino",
-      "items": [
-        "RC y autónomo llenan el mismo Command",
-        "Ambos pasan por la misma seguridad y el mismo tope",
-        "Los actuadores no saben quién dio la orden"
-      ]
-    },
-    {
-      "dot": "rose",
-      "title": "ARM manda siempre",
-      "items": [
-        "Con ARM abierto, armed = false en cualquier modo",
-        "También apaga la secuencia autónoma",
-        "Motor a 0 y timón al centro"
-      ]
-    },
-    {
-      "dot": "amber",
-      "title": "Duty real",
-      "items": [
-        "applied = throttle × 0.80, con rampa de 4 por segundo",
-        "Es lo que se guarda en la columna duty del log",
-        "Con menos de 80 % el barco no se mueve"
-      ]
     }
   ]
 }
