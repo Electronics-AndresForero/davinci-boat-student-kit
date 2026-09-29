@@ -5,7 +5,7 @@
 | Folder | What it is | Use it for |
 |---|---|---|
 | `manual_mode_xbox_controller/` | Bluepad32 project with the **RC-only** firmware (Xbox pad → motor + rudder, arm switch) | **E1–E4**, and any time you just want to drive the boat by hand |
-| `auto_mode_xbox_controller/` | Same project (a git submodule) with the **autonomous-mode** firmware: second physical switch, MPU-6050 gyro heading control, and a flash log dumped over `Console` on the next boot | **E5** and the autonomous run |
+| `auto_mode_xbox_controller/` | Same project with the **autonomous-mode** firmware: second physical switch, MPU-6050 gyro heading control, and a flash log dumped over `Console` on the next boot | **E5** and the autonomous run |
 | `autonomo_borradores/` | Draft sketches (`.txt`) and `analizar_log.py` for turning a run's log into tuning numbers | Reference, not a project |
 | `nintendo_version/` | Same RC firmware for a Nintendo Switch Pro controller | If your team uses that pad |
 

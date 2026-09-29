@@ -15,47 +15,26 @@ student pair needs. It's also used as a git submodule inside the broader
 references this repo alongside the mechanical work — but you don't need that
 repo to do any of the exercises below.
 
-## Repo structure: the `boat-firmware/auto_mode_xbox_controller` submodule
+## Repo structure: the firmware projects
 
-`boat-firmware/auto_mode_xbox_controller/` is itself a **git submodule**, pinned to
+`boat-firmware/` holds three ready-to-build PlatformIO projects. Each one is a copy of
 [Ricardo Quesada's ESP-IDF + Arduino + Bluepad32 template](https://github.com/ricardoquesada/esp-idf-arduino-bluepad32-template)
-— the build scaffolding (PlatformIO project, Bluepad32 component, examples)
-that every exercise builds on top of.
+(the build scaffolding: PlatformIO project, Bluepad32 component, examples) with our own
+`main/sketch.cpp` on top:
 
-**After cloning this repo, always run:**
+| Folder | Firmware |
+|---|---|
+| `boat-firmware/manual_mode_xbox_controller/` | RC only (Xbox pad -> motor + rudder, arm switch). Use it for E1-E4. |
+| `boat-firmware/auto_mode_xbox_controller/` | Autonomous mode (MPU-6050 heading control, AUTO switch, flash log). Use it for E5. |
+| `boat-firmware/nintendo_version/` | RC only, Nintendo Switch Pro controller. |
 
-```
-git submodule update --init --recursive
-```
+They are **plain folders, not git submodules**: a normal `git clone` gives you everything, and
+you can edit and commit `main/sketch.cpp` like any other file. (They used to be a submodule
+pinned to a local-only commit, which broke fresh clones.) Only `E7-espnow-backup/handheld/template`
+is still a submodule - if you use E7, run `git submodule update --init --recursive`.
 
-(or clone with `git clone --recursive <this-repo-url>` in the first place) —
-otherwise `boat-firmware/auto_mode_xbox_controller/` sits empty.
-
-**Before editing any file inside `boat-firmware/auto_mode_xbox_controller/`** (most commonly
-`main/sketch.cpp`, once you're integrating exercises into the real boat's
-firmware), check out the custom branch first:
-
-```
-cd boat-firmware/auto_mode_xbox_controller
-git checkout boat-firmware-custom
-```
-
-Skipping this leaves you on a **detached HEAD** — your edits still work locally,
-but they're not on any branch, so git can lose them (e.g. on garbage collection)
-the moment you check out something else. The submodule's `origin` remote points
-at the upstream template (someone else's public repo) — there's nowhere to push
-your own firmware changes to, so `boat-firmware-custom` only ever exists
-locally, as a safe place to commit. After committing there, go back to this
-repo's root and record the update:
-
-```
-cd ../..                      # back to davinci-boat-student-kit/
-git add boat-firmware/auto_mode_xbox_controller
-git commit -m "..."
-```
-
-That second commit is what makes this repo "remember" which exact state of the
-template your firmware changes are pinned to.
+Build artifacts (`.pio/`, `managed_components/`) are git-ignored; the first build on a new
+machine downloads them.
 
 ## Do this first
 
