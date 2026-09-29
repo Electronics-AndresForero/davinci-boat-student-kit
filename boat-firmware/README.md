@@ -1,6 +1,17 @@
 # boat-firmware — the real project (E1 through E5)
 
-This folder holds **one PlatformIO project** — `template/` — that you keep reusing
+## Which folder do I use?
+
+| Folder | What it is | Use it for |
+|---|---|---|
+| `manual_mode_xbox_controller/` | Bluepad32 project with the **RC-only** firmware (Xbox pad → motor + rudder, arm switch) | **E1–E4**, and any time you just want to drive the boat by hand |
+| `auto_mode_xbox_controller/` | Same project (a git submodule) with the **autonomous-mode** firmware: second physical switch, MPU-6050 gyro heading control, and a flash log dumped over `Console` on the next boot | **E5** and the autonomous run |
+| `autonomo_borradores/` | Draft sketches (`.txt`) and `analizar_log.py` for turning a run's log into tuning numbers | Reference, not a project |
+| `nintendo_version/` | Same RC firmware for a Nintendo Switch Pro controller | If your team uses that pad |
+
+Open **one** folder at a time in PlatformIO. Both build with the `esp32dev` environment.
+
+This folder holds **one PlatformIO project** — `manual_mode_xbox_controller/` — that you keep reusing
 from E1 all the way through E5. Each exercise doesn't get its own project; instead you
 **swap in a new file** as the exercise progresses. That mirrors how the real firmware
 is built: one program that grows a feature at a time, not five disconnected demos.
@@ -21,11 +32,11 @@ The way Bluepad32's author solves this: run **Arduino as a component of ESP-IDF*
 Arduino code — but underneath, ESP-IDF + BTstack are in charge. Practically, this
 means:
 
-- the project lives inside `template/`, which is a **git submodule** pointing at the
+- the project lives inside `manual_mode_xbox_controller/`, a copy of the
   official [esp-idf-arduino-bluepad32-template](https://github.com/ricardoquesada/esp-idf-arduino-bluepad32-template) —
   the reference project Bluepad32's own author maintains, already wired up correctly.
   You don't need to configure any of this yourself.
-- your code lives at **`template/main/sketch.cpp`**, not `src/main.cpp`.
+- your code lives at **`manual_mode_xbox_controller/main/sketch.cpp`**, not `src/main.cpp`.
 - you print with **`Console`, not `Serial`** — Bluepad32 owns the USB serial console
   for its own interactive console, so `Serial.print(...)` gets you garbage or nothing.
   Use `Console.printf(...)` / `Console.println(...)` everywhere in this project.
@@ -36,11 +47,11 @@ Each exercise lives in `exercises/EN-.../`:
 
 ```
 boat-firmware/
-  template/                        ← the Bluepad32 project (git submodule)
+  manual_mode_xbox_controller/       ← the Bluepad32 project for E1–E4 (RC only)
     main/sketch.cpp                ← THIS is what you edit / replace each session
   exercises/
     E1-xbox-pairing/
-      sketch.cpp                   ← copy this OVER template/main/sketch.cpp
+      sketch.cpp                   ← copy this OVER manual_mode_xbox_controller/main/sketch.cpp
       README.md                    ← concepts, task, hints, checkpoint
     E2-drive-motor/...
     E3-servo-rudder/...
@@ -51,24 +62,24 @@ boat-firmware/
 For each session:
 
 1. Open that exercise's `README.md` and read the concepts section first.
-2. Copy its `sketch.cpp` over `template/main/sketch.cpp`. Two ways to do this — pick
+2. Copy its `sketch.cpp` over `manual_mode_xbox_controller/main/sketch.cpp`. Two ways to do this — pick
    whichever is easier:
    - **The click-and-drag way (recommended if you're not comfortable with a
      terminal):** in VS Code's file explorer (left sidebar), open the exercise's
      `sketch.cpp` (e.g. `boat-firmware/exercises/E1-xbox-pairing/sketch.cpp`), select
      all its text (`Ctrl+A` / `⌘+A`) and copy it (`Ctrl+C` / `⌘+C`), then open
-     `boat-firmware/template/main/sketch.cpp`, select all (`Ctrl+A` / `⌘+A`), and
+     `boat-firmware/manual_mode_xbox_controller/main/sketch.cpp`, select all (`Ctrl+A` / `⌘+A`), and
      paste over it (`Ctrl+V` / `⌘+V`). Save (`Ctrl+S` / `⌘+S`).
    - **The command way:** open a terminal **inside VS Code** — top menu **Terminal →
      New Terminal** — which opens already rooted in the repo folder you have open, so
      no `cd` is needed first. Then type (this exact command works in both Windows
      PowerShell and Mac Terminal):
      ```bash
-     cp boat-firmware/exercises/E1-xbox-pairing/sketch.cpp boat-firmware/template/main/sketch.cpp
+     cp boat-firmware/exercises/E1-xbox-pairing/sketch.cpp boat-firmware/manual_mode_xbox_controller/main/sketch.cpp
      ```
-3. Fill in the `TODO`s directly in `template/main/sketch.cpp`.
-4. Open `template/` as the PlatformIO project (**File → Open Folder** →
-   `boat-firmware/template`) and Build + Upload the `esp32dev` environment.
+3. Fill in the `TODO`s directly in `manual_mode_xbox_controller/main/sketch.cpp`.
+4. Open `manual_mode_xbox_controller/` as the PlatformIO project (**File → Open Folder** →
+   `boat-firmware/manual_mode_xbox_controller`) and Build + Upload the `esp32dev` environment.
 5. When you're done and it works, **save a copy of your finished code** back into that
    exercise's own folder (e.g. `exercises/E1-xbox-pairing/sketch.cpp`) so it's not
    lost when you copy the next exercise's skeleton over it in the next session. Later
@@ -80,7 +91,7 @@ For each session:
 If you haven't done [SETUP.md](../SETUP.md) yet (VS Code, PlatformIO, the one-time
 click patch), do that first — this project won't build without it.
 
-The **first build** of `template/` downloads the ESP-IDF toolchain and a couple dozen
+The **first build** of `manual_mode_xbox_controller/` downloads the ESP-IDF toolchain and a couple dozen
 managed components — this takes several minutes the first time, even on a good
 connection. That's normal, not a hang. Let it finish.
 

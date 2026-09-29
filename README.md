@@ -15,9 +15,9 @@ student pair needs. It's also used as a git submodule inside the broader
 references this repo alongside the mechanical work — but you don't need that
 repo to do any of the exercises below.
 
-## Repo structure: the `boat-firmware/template` submodule
+## Repo structure: the `boat-firmware/auto_mode_xbox_controller` submodule
 
-`boat-firmware/template/` is itself a **git submodule**, pinned to
+`boat-firmware/auto_mode_xbox_controller/` is itself a **git submodule**, pinned to
 [Ricardo Quesada's ESP-IDF + Arduino + Bluepad32 template](https://github.com/ricardoquesada/esp-idf-arduino-bluepad32-template)
 — the build scaffolding (PlatformIO project, Bluepad32 component, examples)
 that every exercise builds on top of.
@@ -29,14 +29,14 @@ git submodule update --init --recursive
 ```
 
 (or clone with `git clone --recursive <this-repo-url>` in the first place) —
-otherwise `boat-firmware/template/` sits empty.
+otherwise `boat-firmware/auto_mode_xbox_controller/` sits empty.
 
-**Before editing any file inside `boat-firmware/template/`** (most commonly
+**Before editing any file inside `boat-firmware/auto_mode_xbox_controller/`** (most commonly
 `main/sketch.cpp`, once you're integrating exercises into the real boat's
 firmware), check out the custom branch first:
 
 ```
-cd boat-firmware/template
+cd boat-firmware/auto_mode_xbox_controller
 git checkout boat-firmware-custom
 ```
 
@@ -50,7 +50,7 @@ repo's root and record the update:
 
 ```
 cd ../..                      # back to davinci-boat-student-kit/
-git add boat-firmware/template
+git add boat-firmware/auto_mode_xbox_controller
 git commit -m "..."
 ```
 

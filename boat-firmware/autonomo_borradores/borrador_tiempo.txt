@@ -1,0 +1,239 @@
+// ============================================================================
+//  BORRADOR -- modo autonomo por SECUENCIA DE TIEMPO (dead reckoning puro).
+//  No compilado, no probado. Revisar antes de copiar a main/sketch.cpp.
+//
+//  Que hace: agrega un SEGUNDO interruptor fisico (PIN_AUTO_SWITCH), distinto
+//  del kill switch (PIN_ARM_SWITCH). Cerrado -> ignora el control remoto y
+//  ejecuta una lista fija de pasos {duracion, throttle, steer}. El kill switch
+//  sigue mandando sobre todo, en cualquier modo (RC o autonomo).
+//
+//  NUEVO -- log a flash interna (LittleFS), sin cable en el agua:
+//  Cada LOG_INTERVAL_MS se guarda una fila (t_ms, modo, throttle, steer) en
+//  /log.csv. Al reiniciar (USB conectado de nuevo, barco ya fuera del agua),
+//  ANTES de arrancar normal, se imprime todo el archivo por Serial entre
+//  marcadores ===LOG_START===/===LOG_END=== y se borra para la siguiente
+//  corrida. Captura esa salida (monitor serial, o un script con pyserial) a
+//  un .csv y usa analizar_log.py para sacar los numeros de AUTO_SEQUENCE
+//  automaticamente en vez de leerlos de un video a ojo.
+//
+//  Como se llena AUTO_SEQUENCE (dos formas):
+//   (a) grabar video del recorrido por control remoto, leer tiempos a ojo; o
+//   (b) mejor: dejar correr este mismo firmware en RC (autoActive=false) y
+//       usar el log + analizar_log.py -- te da los tramos ya medidos.
+//
+//  Debilidad conocida (discutida con el usuario): si el barco no arranca en
+//  la misma posicion/angulo del ensayo de calibracion, toda la trayectoria se
+//  desplaza igual -- no hay forma de corregirlo sin un sensor de posicion.
+//  Mitigar con: (1) soltar el barco siempre en el mismo punto/angulo relativo
+//  a la boya de salida, apuntando la proa hacia una referencia fija de la
+//  orilla lejana; (2) diseñar el giro ancho/con margen, no al limite;
+//  (3) el switch se cierra en la orilla, no en el punto de salida -- el
+//  primer paso de AUTO_SEQUENCE debe ser una ESPERA (throttle=0) que cubra
+//  el tiempo de caminar/soltar el barco en el agua.
+//
+//  Motor en M0 (27/13) @ 5 kHz ; servo de timon en 25 @ 50 Hz ; control por BLE.
+// ============================================================================
+#include <Arduino.h>
+#include <Bluepad32.h>
+#include <LittleFS.h>
+
+// ---------- pines ----------
+constexpr int PIN_DRIVE_A   = 27, PIN_DRIVE_B = 13; // motor puerto M0
+constexpr int PIN_STEER     = 25;                   // servo de timon
+constexpr int PIN_LED       = 33;                   // LED de estado
+constexpr int PIN_ARM_SWITCH = 32;   // kill switch. SPDT, un lado a GND.
+                                      // INPUT_PULLUP: cerrado=LOW=armado.
+constexpr int PIN_AUTO_SWITCH = 26;  // mismo header "Servo" que STEER(25)/LED(33)/ARM(32) --
+                                      // confirmado libre en la placa de expansion.
+                                      // Segundo SPDT, mismo esquema: cerrado=LOW=modo autonomo.
+
+// ---------- PWM del motor (5 kHz) ----------
+constexpr int MOT_FREQ = 5000, MOT_BITS = 10, MOT_MAX = (1 << MOT_BITS) - 1;
+
+// ---------- PWM del servo (50 Hz) ----------
+constexpr int SRV_FREQ = 50, SRV_BITS = 16, SRV_PERIOD_US = 20000;
+constexpr int STEER_CENTER_US = 1500, STEER_RANGE_US = 750;
+
+// ---------- ajustes (iguales a Fase 4/5 -- no tocar sin razon) ----------
+constexpr float DEADZONE      = 0.06f;
+constexpr float THROTTLE_SLEW = 4.0f;
+constexpr float DUTY_CAP      = 0.90f;
+
+// ---------- log a flash (LittleFS) ----------
+constexpr unsigned long LOG_INTERVAL_MS   = 50;    // ~20 Hz -- de sobra para esto
+constexpr unsigned long LOG_FLUSH_MS      = 1000;  // guardar a flash cada 1s (no cada fila)
+constexpr const char*   LOG_PATH          = "/log.csv";
+File logFile;
+unsigned long lastLogMs   = 0;
+unsigned long lastFlushMs = 0;
+
+// Al arrancar: si hay un log de una corrida anterior, imprimirlo por Serial y
+// borrarlo. Corre ANTES de tocar motor/servo/BLE -- es pura lectura/escritura
+// de flash, no afecta el resto del arranque.
+void dumpLogOverSerial() {
+  File f = LittleFS.open(LOG_PATH, FILE_READ);
+  if (!f || f.size() == 0) { if (f) f.close(); return; }
+  Serial.println("===LOG_START===");
+  while (f.available()) Serial.write(f.read());
+  Serial.println("\n===LOG_END===");
+  f.close();
+  LittleFS.remove(LOG_PATH);
+}
+
+void logRow(unsigned long now, bool autoMode, float throttle, float steer) {
+  if (!logFile) return;
+  if (now - lastLogMs < LOG_INTERVAL_MS) return;
+  lastLogMs = now;
+  logFile.printf("%lu,%d,%.3f,%.3f\n", now, autoMode ? 1 : 0, throttle, steer);
+  if (now - lastFlushMs >= LOG_FLUSH_MS) { lastFlushMs = now; logFile.flush(); }
+}
+
+// ---------- secuencia autonoma -- LLENAR DESPUES DE CALIBRAR ----------
+// Cada paso: cuanto dura (ms), que throttle (-1..1) y que steer (-1..1) mantener.
+struct AutoStep { unsigned long duration_ms; float throttle; float steer; };
+const AutoStep AUTO_SEQUENCE[] = {
+  { 1500,  0.0f,  0.0f },   // TODO: espera -- tiempo entre cerrar el switch en la orilla y soltar el barco
+  { 3000,  0.7f,  0.0f },   // TODO: recto hasta cerca de la boya
+  { 1500,  0.5f,  0.7f },   // TODO: gira para rodear la boya (steer signo/valor por confirmar)
+  { 4000,  0.7f,  0.0f },   // TODO: recto hasta meta
+};
+constexpr size_t AUTO_STEP_COUNT = sizeof(AUTO_SEQUENCE) / sizeof(AUTO_SEQUENCE[0]);
+
+// ---------- comando normalizado ----------
+struct Command {
+  float throttle = 0;
+  float steer    = 0;
+  bool  armed    = false;
+  unsigned long stamp = 0;
+};
+
+// ---------- actuadores ----------
+class PaddleDrive {
+public:
+  void begin() { ledcAttach(PIN_DRIVE_A, MOT_FREQ, MOT_BITS);
+                 ledcAttach(PIN_DRIVE_B, MOT_FREQ, MOT_BITS); stop(); }
+  void set(float t) {
+    t = constrain(t, -1.f, 1.f);
+    uint32_t duty = (uint32_t)(fabs(t) * MOT_MAX);
+    ledcWrite(PIN_DRIVE_A, t >= 0 ? duty : 0);
+    ledcWrite(PIN_DRIVE_B, t <  0 ? duty : 0);
+  }
+  void stop() { ledcWrite(PIN_DRIVE_A, 0); ledcWrite(PIN_DRIVE_B, 0); }
+};
+
+class Steering {
+public:
+  void begin() { ledcAttach(PIN_STEER, SRV_FREQ, SRV_BITS); set(0); }
+  void set(float s) {
+    s = constrain(s, -1.f, 1.f);
+    int us = STEER_CENTER_US + (int)(s * STEER_RANGE_US);
+    ledcWrite(PIN_STEER, (uint32_t)((uint64_t)us * (1UL << SRV_BITS) / SRV_PERIOD_US));
+  }
+};
+
+PaddleDrive drive;
+Steering    steer;
+
+// ---------- entrada: control Xbox ----------
+ControllerPtr pad = nullptr;
+void onConnect(ControllerPtr c)    { if (!pad) pad = c; }
+void onDisconnect(ControllerPtr c) { if (pad == c) pad = nullptr; }
+
+float deadzone(float v) { return fabs(v) < DEADZONE ? 0.f : v; }
+
+bool armSwitchClosed()  { return digitalRead(PIN_ARM_SWITCH)  == LOW; }
+bool autoSwitchClosed() { return digitalRead(PIN_AUTO_SWITCH) == LOW; }
+
+bool readController(Command& cmd) {
+  if (!pad || !pad->isConnected() || !pad->isGamepad()) return false;
+  float fwd = pad->throttle() / 1023.0f;
+  float rev = pad->brake()    / 1023.0f;
+  cmd.throttle = deadzone(fwd - rev);
+  cmd.steer    = deadzone(pad->axisX() / 512.0f);
+  cmd.armed    = true;
+  cmd.stamp    = millis();
+  return true;
+}
+
+// ---------- estado del modo autonomo ----------
+bool   autoActive      = false;
+size_t autoStepIndex   = 0;
+unsigned long autoStepStartMs = 0;
+
+// Devuelve el Command que toca este ciclo mientras dura la secuencia.
+// Al llegar al ultimo paso se queda en throttle=0 (no repite ni reinicia).
+Command autoStep(unsigned long now) {
+  Command out; out.armed = true; out.stamp = now;
+  if (autoStepIndex >= AUTO_STEP_COUNT) { out.throttle = 0; out.steer = 0; return out; }
+  const AutoStep& s = AUTO_SEQUENCE[autoStepIndex];
+  if (now - autoStepStartMs >= s.duration_ms) {
+    autoStepIndex++;
+    autoStepStartMs = now;
+    return autoStep(now);   // re-evalua de inmediato con el paso nuevo
+  }
+  out.throttle = s.throttle;
+  out.steer    = s.steer;
+  return out;
+}
+
+Command cmd;
+float applied = 0.0f;
+unsigned long lastLoop = 0;
+bool lastAutoSwitch = false;   // para detectar el flanco de encendido del modo autonomo
+
+void setup() {
+  pinMode(PIN_LED, OUTPUT);
+  pinMode(PIN_ARM_SWITCH,  INPUT_PULLUP);
+  pinMode(PIN_AUTO_SWITCH, INPUT_PULLUP);
+
+  Serial.begin(115200);
+  delay(200);                       // dar tiempo a que el monitor serial conecte
+  if (!LittleFS.begin(true)) {      // true = formatear si no monta (primera vez)
+    Serial.println("[log] LittleFS no monto -- log deshabilitado");
+  } else {
+    dumpLogOverSerial();            // vuelca lo de la corrida anterior, si hay
+    logFile = LittleFS.open(LOG_PATH, FILE_APPEND);
+    if (logFile && logFile.size() == 0) logFile.println("t_ms,modo,throttle,steer");
+  }
+
+  drive.begin();
+  steer.begin();
+  BP32.setup(&onConnect, &onDisconnect);
+  BP32.enableVirtualDevice(false);
+  lastLoop = millis();
+  Console.println("\n[Fase 6] Modo autonomo (secuencia por tiempo). Board en soporte -- ruedas al aire!");
+}
+
+void loop() {
+  unsigned long now = millis();
+  float dt = (now - lastLoop) / 1000.0f; lastLoop = now;
+
+  bool autoSw = autoSwitchClosed();
+  if (autoSw && !lastAutoSwitch) {           // flanco: se acaba de cerrar el interruptor autonomo
+    autoActive      = true;
+    autoStepIndex   = 0;
+    autoStepStartMs = now;
+  }
+  if (!autoSw) autoActive = false;
+  lastAutoSwitch = autoSw;
+
+  if (autoActive) {
+    cmd = autoStep(now);
+  } else {
+    BP32.update();
+    if (!readController(cmd)) cmd.armed = false;
+  }
+
+  if (!armSwitchClosed()) { cmd.armed = false; autoActive = false; }  // kill switch manda siempre
+
+  float target  = cmd.armed ? cmd.throttle * DUTY_CAP : 0.0f;
+  float maxStep = THROTTLE_SLEW * dt;
+  applied += constrain(target - applied, -maxStep, maxStep);
+
+  drive.set(applied);
+  steer.set(cmd.armed ? cmd.steer : 0.0f);
+  logRow(now, autoActive, cmd.armed ? cmd.throttle : 0.0f, cmd.armed ? cmd.steer : 0.0f);
+
+  digitalWrite(PIN_LED, cmd.armed ? HIGH : (now / 300 % 2));
+  delay(10);
+}

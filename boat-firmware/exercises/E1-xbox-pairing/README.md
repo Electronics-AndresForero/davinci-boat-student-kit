@@ -66,7 +66,7 @@ small threshold we force to zero, or the boat would creep/wander at rest.
 If this is your first session on `boat-firmware/`, read
 [../../README.md](../../README.md) first — it explains why this project is structured
 differently from `phase0-bringup/` and how to copy this exercise's `sketch.cpp` into
-`template/main/sketch.cpp`.
+`manual_mode_xbox_controller/main/sketch.cpp`.
 
 ## Your task
 
